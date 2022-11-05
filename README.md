@@ -298,7 +298,8 @@ For example, `kobweb create examples/todo` will instantiate a TODO app locally.
 Kobweb, at its core, is a handful of classes responsible for trimming away much of the boilerplate around building a
 Compose for Web app, such as routing and configuring basic CSS styles. It exposes a handful of annotations and utility
 methods which your app can use to communicate intent with the framework. These annotations work in conjunction with our
-Gradle plugin (`com.varabyte.kobweb.application`) that handles code and resource generation for you.
+Gradle plugins (`com.varabyte.kobweb.library` and `com.varabyte.kobweb.application`) that handles code and resource
+generation for you.
 
 Kobweb is also a CLI binary of the same name which provides commands to handle the tedious parts of building and / or
 running a Compose for Web app. We want to get that stuff out of the way, so you can enjoy focusing on the more
@@ -1235,6 +1236,52 @@ To read more about the feature, please check out the
 [official docs](https://docs.gradle.org/current/userguide/platforms.html#sub:conventional-dependencies-toml).
 
 # Advanced topics
+
+## Multimodule
+
+For simplicity, the default site Kobweb creates for you is a monolithic project. All your code is dumped into a single
+module at the project root.
+
+However, Kobweb is capable of splitting code up across modules. To do this, you move your components, pages, and/or
+widgets to separate modules and apply the `com.varabyte.kobweb.library` plugin on them (while the main module applies
+the `com.varabyte.kobweb.application` plugin.)
+
+In other words, you can change a project layout from this:
+
+```
+my-project
+├── build.gradle.kts
+└── src/jsMain
+    └── kotlin.org.example.myproject
+        ├── components
+        └── pages
+```
+
+To something like this:
+
+```
+my-project
+├── sitelib
+│   ├── build.gradle.kts # apply "com.varabyte.kobweb.library"
+│   └── src/jsMain
+│       └── kotlin.org.example.myproject.sitelib
+│           ├── components
+│           └── pages
+└── site
+    ├── build.gradle.kts # apply "com.varabyte.kobweb.application"
+    └── src/jsMain
+        └── kotlin.org.example.myproject.site
+            ├── components
+            └── pages
+```
+
+If you'd like to explore or set up a multimodule project for yourself, you can do so by running:
+
+```bash
+$ kobweb create examples/chat
+```
+
+which demonstrates a chat application with its auth and chat functionality managed in separate modules.
 
 ## Templates
 
